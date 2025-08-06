@@ -64,12 +64,5 @@ class CertificateServiceProvider extends ServiceProvider
         ], function () {
             $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
         });
-
-        // Public routes
-        Route::group([
-            'middleware' => ['web'],
-        ], function () {
-            $this->loadRoutesFrom(__DIR__ . '/routes/public.php');
-        });
     }
 }
