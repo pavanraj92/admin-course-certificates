@@ -23,14 +23,11 @@ class StoreCertificateRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     // Check if email exists in users table
                     $user = DB::table('users')
-                        ->join('user_roles', 'users.role_id', '=', 'user_roles.id')
-                        ->where('users.email', $value)
-                        ->whereIn('user_roles.slug', ['student', 'customer']) // Accept both student and customer roles
-                        ->where('users.status', 'active') // assuming you want active users only
+                        ->where('email', $value)
                         ->first();
                     
                     if (!$user) {
-                        $fail('This email must belong to a registered student/customer in the system.');
+                        $fail('This email must belong to a registered user in the system.');
                     }
                 }
             ],
@@ -58,7 +55,7 @@ class StoreCertificateRequest extends FormRequest
             'student_name.required' => 'Student name is required.',
             'student_email.required' => 'Student email is required.',
             'student_email.email' => 'Please enter a valid email address.',
-            'student_email.exists' => 'This email must belong to a registered student/customer in the system.',
+            'student_email.exists' => 'This email must belong to a registered user in the system.',
             'course_name.required' => 'Course name is required.',
             'course_start_date.required' => 'Course start date is required.',
             'course_end_date.required' => 'Course end date is required.',

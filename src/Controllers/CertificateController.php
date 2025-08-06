@@ -12,49 +12,30 @@ use Illuminate\Support\Facades\Log;
 
 class CertificateController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('admincan_permission:certificates_manager_list')->only(['index']);
+        $this->middleware('admincan_permission:certificates_manager_create')->only(['create', 'store']);
+        $this->middleware('admincan_permission:certificates_manager_edit')->only(['edit', 'update']);
+        $this->middleware('admincan_permission:certificates_manager_view')->only(['show']);
+        $this->middleware('admincan_permission:certificates_manager_delete')->only(['destroy']);
+    }
+
     public function index(Request $request)
     {
-        $query = Certificate::query();
+        try {
+            $certificates = Certificate::query()
+                ->filter($request->query('keyword'))
+                ->filterByStatus($request->query('status'))
+                ->sortable()
+                ->latest()
+                ->paginate(Certificate::getPerPageLimit())
+                ->withQueryString();
 
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('student_name', 'like', "%{$search}%")
-                  ->orWhere('student_email', 'like', "%{$search}%")
-                  ->orWhere('course_name', 'like', "%{$search}%")
-                  ->orWhere('certificate_number', 'like', "%{$search}%");
-            });
+            return view('certificate::admin.index', compact('certificates'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to load certificates: ' . $e->getMessage());
         }
-
-        // Status filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Course filter
-        if ($request->filled('course')) {
-            $query->where('course_code', $request->course);
-        }
-
-        // Date range filter
-        if ($request->filled('date_from')) {
-            $query->where('issue_date', '>=', $request->date_from);
-        }
-        if ($request->filled('date_to')) {
-            $query->where('issue_date', '<=', $request->date_to);
-        }
-
-        $certificates = $query->orderBy('created_at', 'desc')->paginate(15);
-
-        // Get unique courses for filter dropdown
-        $courses = Certificate::select('course_code', 'course_name')
-            ->whereNotNull('course_code')
-            ->distinct()
-            ->orderBy('course_name')
-            ->get();
-
-        return view('certificate::admin.index', compact('certificates', 'courses'));
     }
 
     public function create()
@@ -66,14 +47,14 @@ class CertificateController extends Controller
     {
         try {
             $data = $request->validated();
-            
+
             // Handle file upload
             if ($request->hasFile('certificate_file')) {
                 $file = $request->file('certificate_file');
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $data['certificate_file'] = $file->storeAs('certificates', $filename, 'public');
             }
-            
+
             $certificate = Certificate::create($data);
 
             // Check if it's an AJAX request
@@ -87,10 +68,9 @@ class CertificateController extends Controller
 
             return redirect()->route('admin.certificates.index')
                 ->with('success', 'Certificate created successfully!');
-                
         } catch (\Exception $e) {
             Log::error('Certificate creation error: ' . $e->getMessage());
-            
+
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -142,10 +122,9 @@ class CertificateController extends Controller
 
             return redirect()->route('admin.certificates.index')
                 ->with('success', 'Certificate updated successfully!');
-                
         } catch (\Exception $e) {
             Log::error('Certificate update error: ' . $e->getMessage());
-            
+
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -180,17 +159,6 @@ class CertificateController extends Controller
         return response()->download($filePath, $certificate->certificate_number . '.pdf');
     }
 
-    public function verify($verificationCode)
-    {
-        $certificate = Certificate::where('verification_code', $verificationCode)->first();
-
-        if (!$certificate) {
-            abort(404, 'Certificate not found or invalid verification code.');
-        }
-
-        return view('certificate::admin.verify', compact('certificate'));
-    }
-
     public function bulkDelete(Request $request)
     {
         $request->validate([
@@ -215,17 +183,17 @@ class CertificateController extends Controller
     {
         // You can implement CSV/Excel export functionality here
         // For now, we'll just return a basic CSV export
-        
+
         $query = Certificate::query();
 
         // Apply same filters as index
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('student_name', 'like', "%{$search}%")
-                  ->orWhere('student_email', 'like', "%{$search}%")
-                  ->orWhere('course_name', 'like', "%{$search}%")
-                  ->orWhere('certificate_number', 'like', "%{$search}%");
+                    ->orWhere('student_email', 'like', "%{$search}%")
+                    ->orWhere('course_name', 'like', "%{$search}%")
+                    ->orWhere('certificate_number', 'like', "%{$search}%");
             });
         }
 
@@ -236,15 +204,15 @@ class CertificateController extends Controller
         $certificates = $query->get();
 
         $filename = 'certificates_' . date('Y-m-d_H-i-s') . '.csv';
-        
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function() use ($certificates) {
+        $callback = function () use ($certificates) {
             $file = fopen('php://output', 'w');
-            
+
             // Headers
             fputcsv($file, [
                 'Certificate Number',

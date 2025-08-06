@@ -18,17 +18,6 @@
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <h4 class="card-title mb-0">{{ $certificate->student_name }} - {{ $certificate->certificate_number }}</h4>
                         <div>
-                            <a href="{{ route('admin.certificates.edit', $certificate) }}" class="btn btn-warning">
-                                <i class="mdi mdi-pencil"></i> Edit
-                            </a>
-                            @if($certificate->certificate_file)
-                                <a href="{{ route('admin.certificates.download', $certificate) }}" class="btn btn-success ml-2">
-                                    <i class="mdi mdi-download"></i> Download
-                                </a>
-                            @endif
-                            <a href="{{ $certificate->verification_url }}" target="_blank" class="btn btn-info ml-2">
-                                <i class="mdi mdi-check-circle"></i> Verify
-                            </a>
                             <a href="{{ route('admin.certificates.index') }}" class="btn btn-secondary ml-2">
                                 <i class="mdi mdi-arrow-left"></i> Back to List
                             </a>
@@ -38,8 +27,8 @@
                     <div class="row">
                         <div class="col-md-8">
                             <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Certificate Information</h5>
+                                <div class="card-header bg-primary">
+                                    <h5 class="mb-0 text-white font-bold">Certificate Information</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
@@ -63,11 +52,11 @@
                                                 <label class="font-weight-bold">Issue Date:</label>
                                                 <p>
                                                     @php
-                                                        try {
-                                                            echo $certificate->issue_date ? \Carbon\Carbon::parse($certificate->issue_date)->format('F d, Y') : 'N/A';
-                                                        } catch (\Exception $e) {
-                                                            echo $certificate->issue_date ?? 'N/A';
-                                                        }
+                                                    try {
+                                                    echo $certificate->issue_date ? \Carbon\Carbon::parse($certificate->issue_date)->format('F d, Y') : 'N/A';
+                                                    } catch (\Exception $e) {
+                                                    echo $certificate->issue_date ?? 'N/A';
+                                                    }
                                                     @endphp
                                                 </p>
                                             </div>
@@ -78,11 +67,11 @@
                                                 <label class="font-weight-bold">Expiry Date:</label>
                                                 <p>
                                                     @php
-                                                        try {
-                                                            echo $certificate->expiry_date ? \Carbon\Carbon::parse($certificate->expiry_date)->format('F d, Y') : 'N/A';
-                                                        } catch (\Exception $e) {
-                                                            echo $certificate->expiry_date ?? 'N/A';
-                                                        }
+                                                    try {
+                                                    echo $certificate->expiry_date ? \Carbon\Carbon::parse($certificate->expiry_date)->format('F d, Y') : 'N/A';
+                                                    } catch (\Exception $e) {
+                                                    echo $certificate->expiry_date ?? 'N/A';
+                                                    }
                                                     @endphp
                                                 </p>
                                             </div>
@@ -122,8 +111,8 @@
                             </div>
 
                             <div class="card mt-3">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Course Details</h5>
+                                <div class="card-header bg-primary">
+                                    <h5 class="mb-0 text-white font-bold">Course Details</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
@@ -149,11 +138,11 @@
                                                 <label class="font-weight-bold">Start Date:</label>
                                                 <p>
                                                     @php
-                                                        try {
-                                                            echo $certificate->course_start_date ? \Carbon\Carbon::parse($certificate->course_start_date)->format('F d, Y') : 'N/A';
-                                                        } catch (\Exception $e) {
-                                                            echo $certificate->course_start_date ?? 'N/A';
-                                                        }
+                                                    try {
+                                                    echo $certificate->course_start_date ? \Carbon\Carbon::parse($certificate->course_start_date)->format('F d, Y') : 'N/A';
+                                                    } catch (\Exception $e) {
+                                                    echo $certificate->course_start_date ?? 'N/A';
+                                                    }
                                                     @endphp
                                                 </p>
                                             </div>
@@ -163,11 +152,11 @@
                                                 <label class="font-weight-bold">End Date:</label>
                                                 <p>
                                                     @php
-                                                        try {
-                                                            echo $certificate->course_end_date ? \Carbon\Carbon::parse($certificate->course_end_date)->format('F d, Y') : 'N/A';
-                                                        } catch (\Exception $e) {
-                                                            echo $certificate->course_end_date ?? 'N/A';
-                                                        }
+                                                    try {
+                                                    echo $certificate->course_end_date ? \Carbon\Carbon::parse($certificate->course_end_date)->format('F d, Y') : 'N/A';
+                                                    } catch (\Exception $e) {
+                                                    echo $certificate->course_end_date ?? 'N/A';
+                                                    }
                                                     @endphp
                                                 </p>
                                             </div>
@@ -195,8 +184,8 @@
 
                             @if($certificate->score || $certificate->grade || $certificate->certificate_file)
                             <div class="card mt-3">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Assessment & Files</h5>
+                                <div class="card-header bg-primary">
+                                    <h5 class="mb-0 text-white font-bold">Assessment & Files</h5>
                                 </div>
                                 <div class="card-body">
                                     @if($certificate->score)
@@ -204,8 +193,8 @@
                                         <label class="font-weight-bold">Score:</label>
                                         <div class="d-flex align-items-center">
                                             <div class="progress flex-grow-1 mr-2" style="height: 20px;">
-                                                <div class="progress-bar bg-success" role="progressbar" 
-                                                     style="width: {{ $certificate->score }}%"></div>
+                                                <div class="progress-bar bg-success" role="progressbar"
+                                                    style="width: {{ $certificate->score }}%"></div>
                                             </div>
                                             <span class="font-weight-bold">{{ $certificate->score }}%</span>
                                         </div>
@@ -236,8 +225,8 @@
 
                         <div class="col-md-4">
                             <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Certificate Settings</h5>
+                                <div class="card-header bg-primary">
+                                    <h5 class="mb-0 text-white font-bold">Certificate Settings</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
@@ -266,13 +255,6 @@
                                     @endif
 
                                     <div class="form-group">
-                                        <label class="font-weight-bold">Verification URL:</label>
-                                        <div>
-                                            <small class="text-muted">{{ $certificate->verification_url }}</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
                                         <label class="font-weight-bold">Created:</label>
                                         <p>{{ $certificate->created_at->format('M d, Y \a\t g:i A') }}</p>
                                     </div>
@@ -285,8 +267,8 @@
                             </div>
 
                             <div class="card mt-3">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Quick Actions</h5>
+                                <div class="card-header bg-primary">
+                                    <h5 class="mb-0 text-white font-bold">Quick Actions</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="d-flex flex-column">
@@ -299,10 +281,6 @@
                                             <i class="mdi mdi-download"></i> Download File
                                         </a>
                                         @endif
-
-                                        <a href="{{ $certificate->verification_url }}" target="_blank" class="btn btn-info mb-2">
-                                            <i class="mdi mdi-check-circle"></i> Verify Online
-                                        </a>
 
                                         @admincan('certificates_delete')
                                         <button type="button" class="btn btn-danger delete-btn"

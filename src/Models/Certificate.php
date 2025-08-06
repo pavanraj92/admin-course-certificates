@@ -5,10 +5,13 @@ namespace admin\certificates\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Kyslik\ColumnSortable\Sortable;
+use Illuminate\Support\Facades\Config;
+
 
 class Certificate extends Model
 {
-    use HasFactory;
+    use HasFactory, Sortable;
 
     protected $fillable = [
         'certificate_number',
@@ -40,6 +43,23 @@ class Certificate extends Model
         'created_at',
         'updated_at'
     ];
+    protected $casts = [
+        'course_duration' => 'integer',
+        'score' => 'decimal:2',
+        'status' => 'string'
+    ];
+
+    protected $sortable = [
+        'certificate_number',
+        'student_name',
+        'student_email',
+        'course_name',
+        'issue_date',
+        'expiry_date',
+        'created_at',
+        'updated_at',
+        'status'
+    ];
 
     protected static function boot()
     {
@@ -49,11 +69,37 @@ class Certificate extends Model
             if (empty($certificate->certificate_number)) {
                 $certificate->certificate_number = 'CERT-' . date('Y') . '-' . str_pad(static::count() + 1, 6, '0', STR_PAD_LEFT);
             }
-            
+
             if (empty($certificate->verification_code)) {
                 $certificate->verification_code = Str::random(32);
             }
         });
+    }
+
+    public function scopeFilter($query, $keyword)
+    {
+        if ($keyword) {
+            return $query->where('student_name', 'like', "%{$keyword}%")
+                ->orWhere('student_email', 'like', "%{$keyword}%")
+                ->orWhere('course_name', 'like', "%{$keyword}%")
+                ->orWhere('certificate_number', 'like', "%{$keyword}%");
+        }
+        return $query;
+    }
+
+    public function scopeFilterByStatus($query, $status)
+    {
+        if ($status) {
+            return $query->where('status', $status);
+        }
+        return $query;
+    }
+
+    public static function getPerPageLimit(): int
+    {
+        return Config::has('get.admin_page_limit')
+            ? Config::get('get.admin_page_limit')
+            : 10;
     }
 
     public function getStatusBadgeAttribute()
@@ -74,8 +120,8 @@ class Certificate extends Model
 
     public function isActive()
     {
-        return $this->status === 'active' && 
-               (!$this->expiry_date || $this->expiry_date >= now());
+        return $this->status === 'active' &&
+            (!$this->expiry_date || $this->expiry_date >= now());
     }
 
     public function isExpired()

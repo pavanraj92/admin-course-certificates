@@ -35,29 +35,7 @@
                                     <option value="revoked" {{ app('request')->query('status') == 'revoked' ? 'selected' : '' }}>Revoked</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="course">Course</label>
-                                <select name="course" id="course" class="form-control select2">
-                                    <option value="">All Courses</option>
-                                    @if(isset($courses))
-                                    @foreach($courses as $course)
-                                    <option value="{{ $course }}" {{ app('request')->query('course') == $course ? 'selected' : '' }}>
-                                        {{ $course }}
-                                    </option>
-                                    @endforeach
-                                    @endif
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="date_from">From Date</label>
-                                <input type="date" name="date_from" id="date_from" class="form-control"
-                                    value="{{ app('request')->query('date_from') }}">
-                            </div>
-                        </div>
+                        </div>                        
                         <div class="col-auto mt-1 text-right">
                             <div class="form-group">
                                 <button type="submit" form="filterForm" class="btn btn-primary mt-4">Filter</button>
@@ -85,8 +63,8 @@
                         <table class="table">
                             <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">@sortablelink('certificate_number', 'Certificate #', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
+                                    <th scope="col">S. No.</th>
+                                    <th scope="col">@sortablelink('certificate_number', 'Certificate', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
                                     <th scope="col">@sortablelink('student_name', 'Student', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
                                     <th scope="col">@sortablelink('course_name', 'Course', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
                                     <th scope="col">Grade/Score</th>
@@ -247,9 +225,6 @@
         } catch (error) {
             console.log('Select2 error:', error);
         }
-
-        // DON'T interfere with download buttons - let them work naturally!
-        console.log('Certificate index page loaded');
     });
 </script>
 @endpush
