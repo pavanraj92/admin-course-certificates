@@ -1,0 +1,21 @@
+{
+    "name": "admin/certificates",
+    "description": "Student Certificate Management Package",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "admin\\certificates\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "admin\\certificates\\CertificateServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
