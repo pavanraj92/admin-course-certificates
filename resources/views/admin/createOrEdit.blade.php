@@ -110,8 +110,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Course Start Date <span class="text-danger">*</span></label>
-                                    <input type="date" name="course_start_date" id="course_start_date" class="form-control"
-                                        value="{{ old('course_start_date', isset($certificate) ? ($certificate->course_start_date ? (is_string($certificate->course_start_date) ? $certificate->course_start_date : $certificate->course_start_date->format('Y-m-d')) : '') : '') }}">
+                                    <input type="text" name="course_start_date" id="course_start_date" class="form-control"
+                                        value="{{ old('course_start_date', isset($certificate) ? ($certificate->course_start_date ? (is_string($certificate->course_start_date) ? $certificate->course_start_date : $certificate->course_start_date->format('Y-m-d')) : '') : '') }}"
+                                        placeholder="Select course start date">
                                     @error('course_start_date')
                                     <div class="text-danger validation-error">{{ $message }}</div>
                                     @enderror
@@ -120,8 +121,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Course End Date <span class="text-danger">*</span></label>
-                                    <input type="date" name="course_end_date" id="course_end_date" class="form-control"
-                                        value="{{ old('course_end_date', isset($certificate) ? ($certificate->course_end_date ? (is_string($certificate->course_end_date) ? $certificate->course_end_date : $certificate->course_end_date->format('Y-m-d')) : '') : '') }}">
+                                    <input type="text" name="course_end_date" id="course_end_date" class="form-control"
+                                        value="{{ old('course_end_date', isset($certificate) ? ($certificate->course_end_date ? (is_string($certificate->course_end_date) ? $certificate->course_end_date : $certificate->course_end_date->format('Y-m-d')) : '') : '') }}"
+                                        placeholder="Select course end date">
                                     @error('course_end_date')
                                     <div class="text-danger validation-error">{{ $message }}</div>
                                     @enderror
@@ -144,8 +146,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Issue Date <span class="text-danger">*</span></label>
-                                    <input type="date" name="issue_date" id="issue_date" class="form-control"
-                                        value="{{ old('issue_date', isset($certificate) ? ($certificate->issue_date ? (is_string($certificate->issue_date) ? $certificate->issue_date : $certificate->issue_date->format('Y-m-d')) : date('Y-m-d')) : date('Y-m-d')) }}">
+                                    <input type="text" name="issue_date" id="issue_date" class="form-control"
+                                        value="{{ old('issue_date', isset($certificate) ? ($certificate->issue_date ? (is_string($certificate->issue_date) ? $certificate->issue_date : $certificate->issue_date->format('Y-m-d')) : date('Y-m-d')) : date('Y-m-d')) }}"
+                                        placeholder="Select issue date">
                                     @error('issue_date')
                                     <div class="text-danger validation-error">{{ $message }}</div>
                                     @enderror
@@ -227,8 +230,9 @@
 
                         <div class="form-group">
                             <label>Expiry Date</label>
-                            <input type="date" name="expiry_date" id="expiry_date" class="form-control"
-                                value="{{ old('expiry_date', isset($certificate) ? ($certificate->expiry_date ? (is_string($certificate->expiry_date) ? $certificate->expiry_date : $certificate->expiry_date->format('Y-m-d')) : '') : '') }}">
+                            <input type="text" name="expiry_date" id="expiry_date" class="form-control"
+                                value="{{ old('expiry_date', isset($certificate) ? ($certificate->expiry_date ? (is_string($certificate->expiry_date) ? $certificate->expiry_date : $certificate->expiry_date->format('Y-m-d')) : '') : '') }}"
+                                placeholder="Select expiry date">
                             @error('expiry_date')
                             <div class="text-danger validation-error">{{ $message }}</div>
                             @enderror
@@ -291,12 +295,7 @@
                     <div class="card-body">
                         <div class="certificate-info">
                             <p class="mb-2"><strong>Certificate Number:</strong><br>{{ $certificate->certificate_number }}</p>
-                            <p class="mb-2"><strong>Verification Code:</strong><br><code>{{ $certificate->verification_code }}</code></p>
-                            <p class="mb-0"><strong>Verification URL:</strong><br>
-                                <a href="{{ $certificate->verification_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                    <i class="mdi mdi-open-in-new"></i> Verify Certificate
-                                </a>
-                            </p>
+                            <p class="mb-2"><strong>Verification Code:</strong><br><code>{{ $certificate->verification_code }}</code></p>                            
                         </div>
                     </div>
                 </div>
@@ -313,6 +312,8 @@
 @push('styles')
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- jQuery UI CSS -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <!-- Custom CSS -->
 <style>
     .existing-file {
@@ -342,8 +343,13 @@
 @endpush
 
 @push('scripts')
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <script>
 $(document).ready(function() {    
+    // Open datepicker on click for all date fields
+    $('#course_start_date, #course_end_date, #issue_date, #expiry_date').on('focus click', function() {
+        $(this).datepicker('show');
+    });
     // Client-side validation functions
     function showError(inputId, message) {
         const input = $('#' + inputId);
@@ -355,6 +361,43 @@ $(document).ready(function() {
             input.after('<div class="text-danger client-validation-error mt-1" style="font-size: 12px;">' + message + '</div>');
         }
     }
+
+    // Initialize jQuery UI datepicker for all date fields, disabling dates before today
+    var today = new Date();
+    var minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    function customizeDatepickerButtons(input, inst) {
+        setTimeout(function() {
+            var buttonPane = $(inst.dpDiv).find('.ui-datepicker-buttonpane');
+            buttonPane.find('.ui-datepicker-close').hide();
+            buttonPane.find('.ui-datepicker-current').hide(); // Hide Today button
+            // Remove any existing clear buttons to avoid duplicates
+            buttonPane.find('.ui-datepicker-clear').remove();
+            $('<button type="button" class="ui-datepicker-clear ui-state-default ui-priority-primary ui-corner-all" style="margin-left:8px;">Clear</button>')
+                .appendTo(buttonPane)
+                .on('click', function() {
+                    $(input).val('');
+                    $(input).datepicker('hide');
+                });
+        }, 1);
+    }
+
+    $('#course_start_date, #course_end_date, #issue_date, #expiry_date').datepicker({
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        showButtonPanel: true,
+        autoclose: true,
+        minDate: minDate,
+        beforeShow: customizeDatepickerButtons,
+        onChangeMonthYear: function(year, month, inst) {
+            var input = inst.input ? inst.input[0] : null;
+            if (input) customizeDatepickerButtons(input, inst);
+        },
+        onSelect: function(dateText, inst) {
+            var input = inst.input ? inst.input[0] : null;
+            if (input) customizeDatepickerButtons(input, inst);
+        }
+    });
     
     function clearError(inputId) {
         const input = $('#' + inputId);
@@ -487,7 +530,7 @@ $(document).ready(function() {
         } else if (parseInt(value) < 1) {
             showError('course_duration', 'Course duration must be at least 1 hour.');
         } else if (parseInt(value) > 10000) {
-            showError('course_duration', 'Course duration seems too high. Please check.');
+            showError('course_duration', 'Course duration seems to high. Please check.');
         } else {
             clearError('course_duration');
         }
@@ -600,6 +643,8 @@ $(document).ready(function() {
             const estimatedHours = diffDays * 8;
             
             var isEditMode = {{ isset($certificate) ? 'true' : 'false' }};
+            // Fix: Output as JS boolean, not raw Blade
+            var isEditMode = @json(isset($certificate));
             
             if (!isEditMode) {
                 if (!$('#course_duration').val()) {
