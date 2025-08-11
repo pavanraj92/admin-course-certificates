@@ -2,10 +2,10 @@
 
 @section('title', 'Certificates Management')
 
-@section('page-title', 'Manage Certificates')
+@section('page-title', 'Certificate Manager')
 
 @section('breadcrumb')
-<li class="breadcrumb-item active" aria-current="page">Manage Certificates</li>
+<li class="breadcrumb-item active" aria-current="page">Certificate Manager</li>
 @endsection
 
 @section('content')
@@ -25,7 +25,7 @@
                                     value="{{ app('request')->query('keyword') }}" placeholder="Student name, email, course...">
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select name="status" id="status" class="form-control select2">
@@ -54,7 +54,7 @@
                     @admincan('certificates_manager_create')
                     <div class="text-right">
                         <a href="{{ route('admin.certificates.create') }}" class="btn btn-primary mb-3">
-                            <i class="mdi mdi-plus"></i> Create New Certificate
+                            Create New Certificate
                         </a>
                     </div>
                     @endadmincan

@@ -19,7 +19,7 @@
                         <h4 class="card-title mb-0">{{ $certificate->student_name }} - {{ $certificate->certificate_number }}</h4>
                         <div>
                             <a href="{{ route('admin.certificates.index') }}" class="btn btn-secondary ml-2">
-                                <i class="mdi mdi-arrow-left"></i> Back to List
+                              Back
                             </a>
                         </div>
                     </div>
@@ -309,26 +309,38 @@
 
             let url = $(this).data('url');
 
-            if (confirm('Are you sure you want to delete this certificate? This action cannot be undone.')) {
-                $.ajax({
-                    url: url,
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            window.location.href = '{{ route("admin.certificates.index") }}';
-                            toastr.success(response.message);
-                        } else {
-                            toastr.error(response.message);
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you really want to delete this certificate? This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Deleted!', response.message, 'success').then(() => {
+                                    window.location.href = '{{ route("admin.certificates.index") }}';
+                                });
+                            } else {
+                                Swal.fire('Error!', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error!', 'Something went wrong!', 'error');
                         }
-                    },
-                    error: function() {
-                        toastr.error('Something went wrong!');
-                    }
-                });
-            }
+                    });
+                }
+            });
         });
     });
 </script>

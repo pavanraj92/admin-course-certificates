@@ -144,9 +144,7 @@ class CertificateController extends Controller
         }
 
         $certificate->delete();
-
-        return redirect()->route('admin.certificates.index')
-            ->with('success', 'Certificate deleted successfully!');
+        return response()->json(['success' => true, 'message' => 'Record deleted successfully.']);
     }
 
     public function download(Certificate $certificate)

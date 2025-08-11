@@ -192,11 +192,10 @@
 
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary" id="saveBtn">
-                                <i class="mdi mdi-content-save"></i>
-                                {{ isset($certificate) ? 'Update Certificate' : 'Save Certificate' }}
+                                {{ isset($certificate) ? 'Update' : 'Save' }}
                             </button>
                             <a href="{{ route('admin.certificates.index') }}" class="btn btn-secondary">
-                                <i class="mdi mdi-arrow-left"></i> Back
+                                Back
                             </a>
                         </div>
                     </div>
