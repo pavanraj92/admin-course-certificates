@@ -30,6 +30,7 @@ return new class extends Migration
             $table->enum('status', ['active', 'expired', 'revoked'])->default('active');
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index(['certificate_number', 'verification_code']);
             $table->index(['student_email', 'course_code']);

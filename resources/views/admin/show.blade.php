@@ -19,7 +19,7 @@
                         <h4 class="card-title mb-0">{{ $certificate->student_name }} - {{ $certificate->certificate_number }}</h4>
                         <div>
                             <a href="{{ route('admin.certificates.index') }}" class="btn btn-secondary ml-2">
-                              Back
+                                Back
                             </a>
                         </div>
                     </div>
@@ -51,13 +51,7 @@
                                             <div class="form-group">
                                                 <label class="font-weight-bold">Issue Date:</label>
                                                 <p>
-                                                    @php
-                                                    try {
-                                                    echo $certificate->issue_date ? \Carbon\Carbon::parse($certificate->issue_date)->format('F d, Y') : 'N/A';
-                                                    } catch (\Exception $e) {
-                                                    echo $certificate->issue_date ?? 'N/A';
-                                                    }
-                                                    @endphp
+                                                    {{ $certificate->issue_date ? $certificate->issue_date->format(config('GET.admin_date_time_format') ?? 'Y-m-d H:i:s') : '—' }}
                                                 </p>
                                             </div>
                                         </div>
@@ -66,13 +60,7 @@
                                             <div class="form-group">
                                                 <label class="font-weight-bold">Expiry Date:</label>
                                                 <p>
-                                                    @php
-                                                    try {
-                                                    echo $certificate->expiry_date ? \Carbon\Carbon::parse($certificate->expiry_date)->format('F d, Y') : 'N/A';
-                                                    } catch (\Exception $e) {
-                                                    echo $certificate->expiry_date ?? 'N/A';
-                                                    }
-                                                    @endphp
+                                                    {{ $certificate->expiry_date ? $certificate->expiry_date->format(config('GET.admin_date_time_format') ?? 'Y-m-d H:i:s') : '—' }}
                                                 </p>
                                             </div>
                                             @endif
@@ -137,13 +125,7 @@
                                             <div class="form-group">
                                                 <label class="font-weight-bold">Start Date:</label>
                                                 <p>
-                                                    @php
-                                                    try {
-                                                    echo $certificate->course_start_date ? \Carbon\Carbon::parse($certificate->course_start_date)->format('F d, Y') : 'N/A';
-                                                    } catch (\Exception $e) {
-                                                    echo $certificate->course_start_date ?? 'N/A';
-                                                    }
-                                                    @endphp
+                                                    {{ $certificate->course_start_date ? $certificate->course_start_date->format(config('GET.admin_date_time_format') ?? 'Y-m-d H:i:s') : '—' }}
                                                 </p>
                                             </div>
                                         </div>
@@ -151,13 +133,7 @@
                                             <div class="form-group">
                                                 <label class="font-weight-bold">End Date:</label>
                                                 <p>
-                                                    @php
-                                                    try {
-                                                    echo $certificate->course_end_date ? \Carbon\Carbon::parse($certificate->course_end_date)->format('F d, Y') : 'N/A';
-                                                    } catch (\Exception $e) {
-                                                    echo $certificate->course_end_date ?? 'N/A';
-                                                    }
-                                                    @endphp
+                                                    {{ $certificate->course_end_date ? $certificate->course_end_date->format(config('GET.admin_date_time_format') ?? 'Y-m-d H:i:s') : '—' }}
                                                 </p>
                                             </div>
                                         </div>
@@ -256,13 +232,9 @@
 
                                     <div class="form-group">
                                         <label class="font-weight-bold">Created:</label>
-                                        <p>{{ $certificate->created_at->format('M d, Y \a\t g:i A') }}</p>
+                                        <p>{{ $certificate->created_at ? $certificate->created_at->format(config('GET.admin_date_time_format') ?? 'Y-m-d H:i:s') : '—' }}</p>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Last Updated:</label>
-                                        <p>{{ $certificate->updated_at->format('M d, Y \a\t g:i A') }}</p>
-                                    </div>
                                 </div>
                             </div>
 
@@ -272,9 +244,11 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="d-flex flex-column">
+                                        @admincan('certificates_manager_edit')
                                         <a href="{{ route('admin.certificates.edit', $certificate) }}" class="btn btn-warning mb-2">
                                             <i class="mdi mdi-pencil"></i> Edit Certificate
                                         </a>
+                                        @endadmincan
 
                                         @if($certificate->certificate_file)
                                         <a href="{{ route('admin.certificates.download', $certificate) }}" class="btn btn-success mb-2">
@@ -282,9 +256,9 @@
                                         </a>
                                         @endif
 
-                                        @admincan('certificates_delete')
+                                        @admincan('certificates_manager_delete')
                                         <button type="button" class="btn btn-danger delete-btn"
-                                            data-url="{{ route('admin.certificates.destroy', $certificate) }}">
+                                            data-url="{{ route('admin.certificates.destroy', $certificate) }}" data-text="Are you sure you want to delete this record?" data-method="DELETE">
                                             <i class="mdi mdi-delete"></i> Delete Certificate
                                         </button>
                                         @endadmincan
@@ -304,40 +278,53 @@
 <script>
     $(document).ready(function() {
         // Delete functionality
-        $('.delete-btn').on('click', function(e) {
+        $(document).on('click', '.delete-btn', function(e) {
             e.preventDefault();
-
-            let url = $(this).data('url');
+            var currentElement = $(this);
+            var id = $(this).data('id');
+            var url = $(this).data('url');
+            var method = $(this).data('method') || 'POST'; // Default to POST if method is not specified
+            var text = $(this).data('text') || "You won't be able to revert this!"; // Default text if not specified
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: 'Do you really want to delete this certificate? This action cannot be undone.',
-                icon: 'warning',
+                text: text,
+                icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel'
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                customClass: {
+                    confirmButton: "btn btn-outline-danger",
+                    cancelButton: "btn btn-outline-success",
+                },
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
+                        type: method,
                         url: url,
-                        type: 'DELETE',
                         data: {
-                            _token: '{{ csrf_token() }}'
+                            id: id
                         },
                         success: function(response) {
                             if (response.success) {
-                                Swal.fire('Deleted!', response.message, 'success').then(() => {
-                                    window.location.href = '{{ route("admin.certificates.index") }}';
-                                });
+                                currentElement.closest("tr").remove();
+                                toastr.success(response.message);
+                                setTimeout(function() {
+                                    window.location.href = "{{ route('admin.certificates.index') }}";
+                                }, 1000);
                             } else {
-                                Swal.fire('Error!', response.message, 'error');
+                                toastr.error(response.message);
                             }
                         },
-                        error: function() {
-                            Swal.fire('Error!', 'Something went wrong!', 'error');
-                        }
+                        error: function(xhr, status, error) {
+                            console.error("Error deleting record:", error);
+                            console.error("Status:", status);
+                            console.error("Response:", xhr.responseText);
+                            toastr.error(
+                                "An error occurred while deleting the record. please try again."
+                            );
+                        },
                     });
                 }
             });
