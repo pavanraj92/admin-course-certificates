@@ -4,6 +4,7 @@ namespace admin\certificates\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Kyslik\ColumnSortable\Sortable;
 use Illuminate\Support\Facades\Config;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Config;
 
 class Certificate extends Model
 {
-    use HasFactory, Sortable;
+    use HasFactory, Sortable, SoftDeletes;
 
     protected $fillable = [
         'certificate_number',
@@ -32,7 +33,8 @@ class Certificate extends Model
         'certificate_file',
         'verification_code',
         'status',
-        'notes'
+        'notes',
+        'deleted_at'
     ];
 
     protected $dates = [
@@ -46,7 +48,11 @@ class Certificate extends Model
     protected $casts = [
         'course_duration' => 'integer',
         'score' => 'decimal:2',
-        'status' => 'string'
+        'status' => 'string',
+        'issue_date'  => 'datetime',
+        'expiry_date' => 'datetime',
+        'course_start_date' => 'datetime',
+        'course_end_date' => 'datetime',
     ];
 
     protected $sortable = [

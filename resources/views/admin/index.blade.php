@@ -35,7 +35,7 @@
                                     <option value="revoked" {{ app('request')->query('status') == 'revoked' ? 'selected' : '' }}>Revoked</option>
                                 </select>
                             </div>
-                        </div>                        
+                        </div>
                         <div class="col-auto mt-1 text-right">
                             <div class="form-group">
                                 <button type="submit" form="filterForm" class="btn btn-primary mt-4">Filter</button>
@@ -68,7 +68,7 @@
                                     <th scope="col">@sortablelink('student_name', 'Student', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
                                     <th scope="col">@sortablelink('course_name', 'Course', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
                                     <th scope="col">Grade/Score</th>
-                                    <th scope="col">@sortablelink('issue_date', 'Issue Date', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
+                                    <th scope="col">@sortablelink('created_at', 'Created At', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
                                     <th scope="col">@sortablelink('status', 'Status', [], ['style' => 'color: #4F5467; text-decoration: none;'])</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -117,24 +117,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @php
-                                        try {
-                                        $issueDate = $certificate->issue_date ? \Carbon\Carbon::parse($certificate->issue_date) : null;
-                                        echo $issueDate ? $issueDate->format(config('GET.admin_date_time_format') ?? 'M d, Y') : '—';
-                                        } catch (\Exception $e) {
-                                        echo $certificate->issue_date ?? '—';
-                                        }
-                                        @endphp
-                                        @if($certificate->expiry_date)
-                                        @php
-                                        try {
-                                        $expiryDate = \Carbon\Carbon::parse($certificate->expiry_date);
-                                        echo '<br><small class="text-muted">Expires: ' . $expiryDate->format('M d, Y') . '</small>';
-                                        } catch (\Exception $e) {
-                                        echo '<br><small class="text-muted">Expires: ' . $certificate->expiry_date . '</small>';
-                                        }
-                                        @endphp
-                                        @endif
+                                        {{ $certificate->created_at ? $certificate->created_at->format(config('GET.admin_date_time_format') ?? 'Y-m-d H:i:s') : '—' }}
                                     </td>
                                     <td>
                                         @if ($certificate->status == 'active')
