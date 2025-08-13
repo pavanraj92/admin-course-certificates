@@ -168,7 +168,7 @@
                                 @endforeach
                                 @else
                                 <tr>
-                                    <td colspan="8" class="text-center">No certificates found.</td>
+                                    <td colspan="8" class="text-center">No records found.</td>
                                 </tr>
                                 @endif
                             </tbody>
