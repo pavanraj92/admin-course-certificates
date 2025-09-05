@@ -19,7 +19,13 @@ class CertificateServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/views'      // Package views as fallback
         ], 'certificate');
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/certificates.php', 'certificates.constants');
+        // Load published module config first (if it exists), then fallback to package config
+        if (file_exists(base_path('Modules/Certificates/config/certificates.php'))) {
+            $this->mergeConfigFrom(base_path('Modules/Certificates/config/certificates.php'), 'certificates.config');
+        } else {
+            // Fallback to package config if published config doesn't exist
+            $this->mergeConfigFrom(__DIR__ . '/../config/certificates.php', 'certificates.config');
+        }
 
         // Also register module views with a specific namespace for explicit usage
         if (is_dir(base_path('Modules/Certificates/resources/views'))) {
@@ -30,12 +36,6 @@ class CertificateServiceProvider extends ServiceProvider
         // Also load migrations from published module if they exist
         if (is_dir(base_path('Modules/Certificates/database/migrations'))) {
             $this->loadMigrationsFrom(base_path('Modules/Certificates/database/migrations'));
-        }
-        $this->mergeConfigFrom(__DIR__ . '/../config/certificates.php', 'certificates.config');
-
-        // Also merge config from published module if it exists
-        if (file_exists(base_path('Modules/Certificates/config/certificates.php'))) {
-            $this->mergeConfigFrom(base_path('Modules/Certificates/config/certificates.php'), 'certificates.config');
         }
         // Standard publishing for non-PHP files
         $this->publishes([
